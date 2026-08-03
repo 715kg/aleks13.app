@@ -1,0 +1,1 @@
+var e=`/images/hero-planet.webp`;export{e as t};

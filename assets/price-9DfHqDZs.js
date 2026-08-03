@@ -1,0 +1,1 @@
+function e(e){return Math.round(parseFloat(e)).toLocaleString(`ru-RU`)}export{e as t};
