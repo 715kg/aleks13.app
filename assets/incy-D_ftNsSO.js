@@ -1,0 +1,1 @@
+var e=`/images/apps/happ.webp`,t=`/images/apps/incy.webp`;export{e as n,t};
