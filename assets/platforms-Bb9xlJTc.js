@@ -1,0 +1,1 @@
+var e=[[`ios`,`iOS`],[`android`,`Android`],[`macos`,`macOS`],[`windows`,`Windows`],[`linux`,`Linux`]],t=[...e,[`androidtv`,`Android TV`]];export{e as n,t};
