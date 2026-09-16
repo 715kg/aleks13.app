@@ -1,1 +1,0 @@
-var e=`/images/logo.webp`;export{e as t};
