@@ -45,15 +45,33 @@
       // a visitor's network (common for a VPN-service audience) must not
       // hold up the site — see the outage this fixed, where the script's
       // hung connection blocked the whole page for non-Telegram visitors.
-      if (/tgWebApp/.test(window.location.hash)) {
-        var tgScript = document.createElement('script')
-        tgScript.src = 'https://telegram.org/js/telegram-web-app.js'
-        document.head.appendChild(tgScript)
-      }
+      // window.__tgReady resolves once the SDK has loaded (or failed/timed
+      // out) — auth.js awaits it before trusting window.Telegram.WebApp,
+      // so it can't race a dynamically-injected <script> that's still
+      // fetching from telegram.org when the app's first auth check runs
+      // (that race let a stale session cookie from a previously-linked
+      // Telegram account win over the fresh one Telegram just launched
+      // with — see reconcileTelegram's own comment for the account-switch
+      // problem it exists to catch). The 3s timeout keeps the promise from
+      // hanging forever on a slow/blocked telegram.org, same reasoning as
+      // not loading it at all for non-Telegram visitors below.
+      window.__tgReady = /tgWebApp/.test(window.location.hash)
+        ? Promise.race([
+            new Promise(function (resolve) {
+              var tgScript = document.createElement('script')
+              tgScript.src = 'https://telegram.org/js/telegram-web-app.js'
+              tgScript.onload = resolve
+              tgScript.onerror = resolve
+              document.head.appendChild(tgScript)
+            }),
+            new Promise(function (resolve) {
+              setTimeout(resolve, 3000)
+            }),
+          ])
+        : Promise.resolve()
     </script>
-    <script type="module" crossorigin src="/assets/index-ieiNxM_F.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/runtime-core.esm-bundler-DdMLACiF.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-B_Qh-gs4.css">
+    <script type="module" crossorigin src="/assets/index-Bptbooxr.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-yp6J3Ss_.css">
   </head>
   <body class="min-h-screen bg-[#121212] font-sans text-white selection:bg-[#2a2a2a] selection:text-black">
     <div id="app"></div>
