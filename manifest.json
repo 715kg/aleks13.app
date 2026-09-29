@@ -1,7 +1,7 @@
 {
   "name": "ALEKS13.APP",
   "short_name": "ALEKS13",
-  "description": "Личный кабинет ALEKS13.APP — управление VPN-подпиской",
+  "description": "Личный кабинет ALEKS13.APP — управление подпиской",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
