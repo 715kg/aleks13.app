@@ -1,1 +1,0 @@
-import{u as e}from"./index-dpWcAajw.js";var t=e(`bindEmail`,{state:()=>({isOpen:!1,autoDismissed:!1}),actions:{open(){this.isOpen=!0},close(){this.isOpen=!1},dismissAuto(){this.autoDismissed=!0,this.isOpen=!1}}});export{t};

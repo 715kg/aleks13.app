@@ -1,0 +1,1 @@
+function e(e){if(e==null)return`—`;let t=e/1024**4;if(t>=1)return`${t.toFixed(t>=10?0:1)} ТБ`;let n=e/1024**3;if(n>=1)return`${n.toFixed(n>=10?0:1)} ГБ`;let r=e/1024**2;return`${Math.max(r,0).toFixed(0)} МБ`}export{e as t};
