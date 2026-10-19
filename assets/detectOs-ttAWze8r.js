@@ -1,1 +1,0 @@
-function e(){if(typeof navigator>`u`)return null;let e=navigator.userAgent||``,t=navigator.platform||``;return/iPhone|iPad|iPod/.test(e)||t===`MacIntel`&&navigator.maxTouchPoints>1?`ios`:/Android/.test(e)?`android`:/Mac/.test(t)?`macos`:/Win/.test(t)?`windows`:null}export{e as t};

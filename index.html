@@ -22,6 +22,31 @@
         }
       })(window.location)
     </script>
+    <script type="text/javascript">
+      // «Открыть в Happ / Incy» bridge (the /open page, views/OpenInAppView.vue,
+      // utils/openInApp.js): the key link the Mini App wants opened rides in
+      // the URL fragment — /open#app=…&link=… — which never reaches the
+      // server, but WOULD be read by anything on the page that looks at the
+      // address (analytics tags, error trackers) and would stay in the history.
+      // So, before any such script runs, the fragment is moved into
+      // sessionStorage (the page reads it from there once and deletes it) and
+      // the address is cleaned. Runs after the GitHub Pages decoder above, so
+      // the pathname is already the real /open. If the stash isn't possible
+      // (storage blocked) the fragment is left alone and the page reads it
+      // from the address instead. Keep any analytics/tracking snippet BELOW
+      // this script, never above it.
+      ;(function (l) {
+        if (!/\/open\/?$/.test(l.pathname) || l.hash.length < 2) return
+        try {
+          sessionStorage.setItem('open_in_app', l.hash.slice(1))
+        } catch (e) {
+          return
+        }
+        try {
+          window.history.replaceState(window.history.state, '', l.pathname + l.search)
+        } catch (e) {}
+      })(window.location)
+    </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -40,7 +65,9 @@
       // Mini App launch (that's also where window.Telegram.WebApp.initData
       // comes from) — so its presence is a reliable way to tell "opened
       // inside Telegram" from "opened as a normal website" BEFORE loading
-      // anything. Only fetch the SDK for the former: a plain browser/phone
+      // anything (a reload inside the Mini App has lost the hash — the
+      // sessionStorage flag set below stands in for it). Only fetch the SDK
+      // for the former: a plain browser/phone
       // visit has no use for it, and telegram.org being slow or blocked on
       // a visitor's network (common for a VPN-service audience) must not
       // hold up the site — see the outage this fixed, where the script's
@@ -56,13 +83,29 @@
       // hanging forever on a slow/blocked telegram.org, same reasoning as
       // not loading it at all for non-Telegram visitors below.
       var tgLaunch = /tgWebApp/.test(window.location.hash)
+      // Fresh launch (tgWebApp in the ORIGINAL hash) vs. a reload inside the
+      // Mini App: after a reload the SDK restores the old initData from
+      // sessionStorage, which may already be stale (Telegram's auth_date
+      // expires server-side after 24h). Read once, right here, before the
+      // router touches the address — stores/auth.js ensureLoaded() and
+      // views/LoginView.vue only trust initData when this is true.
+      window.__tgFreshLaunch = tgLaunch
       // The hash is gone after the first router navigation, and a reload
       // inside the Mini App comes back without it — remember the launch
-      // for the rest of the WebView session (useInstallPrompt reads it).
+      // for the rest of the WebView session (utils/telegram.js's
+      // isTelegramMiniApp reads it; keep the key in sync with it).
+      var tgInMiniApp = false
       try {
         if (tgLaunch) sessionStorage.setItem('tg_mini_app', '1')
+        tgInMiniApp = sessionStorage.getItem('tg_mini_app') === '1'
       } catch (e) {}
-      window.__tgReady = tgLaunch
+      // So the SDK is fetched on the launch itself AND on every reload inside
+      // the same WebView session. It restores the launch parameters (initData
+      // included) from sessionStorage on its own — it saves them there on
+      // every load — so after a reload window.Telegram.WebApp.initData and
+      // openLink() work again. A plain browser visit has neither the hash nor
+      // the flag and still never touches telegram.org.
+      window.__tgReady = tgLaunch || tgInMiniApp
         ? Promise.race([
             new Promise(function (resolve) {
               var tgScript = document.createElement('script')
@@ -77,9 +120,9 @@
           ])
         : Promise.resolve()
     </script>
-    <script type="module" crossorigin src="/assets/index-iT5RBdhO.js"></script>
+    <script type="module" crossorigin src="/assets/index-BnP48fJa.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/runtime-core.esm-bundler-C3bAwFk8.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-DhmvBJtQ.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BdMr3htJ.css">
   </head>
   <body class="min-h-screen bg-[#121212] font-sans text-white selection:bg-[#2a2a2a] selection:text-black">
     <div id="app"></div>
